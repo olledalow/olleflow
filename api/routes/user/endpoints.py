@@ -13,22 +13,16 @@ from datetime import datetime, timezone
 router = APIRouter()
 
 
-@router.post("", response_model=UserRead, description="manual endpoint")
+@router.post(
+    "", response_model=UserRead, description="manual endpoint", status_code=201
+)
 async def create_item(
     *,
     item_in: UserCreate = Body(...),
     db: AsyncSession = Depends(get_db_session),
 ) -> Any:
 
-    new_user = User(
-        email=item_in.email,
-        hashed_password=item_in.password + "H4$SH3D",
-        created_at=datetime.now(timezone.utc),
-    )
-
-    print(new_user)
-    print("$$$$$$$$" * 10)
-    return await user_service.create_user(db, new_user)
+    return await user_service.create_user(db, item_in)
 
 
 router = init_basic_endpoints(
