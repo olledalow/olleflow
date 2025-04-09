@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtualenv
+.venv/
+env/
+venv/
+ENV/
+
+# VS Code / Editor configs
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.*
+
+# Alembic
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
+# (optional) if you ever generate .sql versions
+alembic/versions/*.sql
+
+# Migrations cache
+*.sqlite3
+
+# Logs / artifacts
+*.log
+logs/
+coverage.*
+htmlcov/
+.tox/
+.cache/
+pytest_cache/
+.mypy_cache/
+.dmypy.json
+.pytest_cache/
+
+# Testing reports
+test-results/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Docker
+*.pid
+*.pid.lock
+docker-compose.override.yml
+
+# Pyright / PyLance / Type checker noise
+typings/
+
+# Optional: Pydantic V2 schema cache
+__pydantic_schema__/
+
+# Optional: Poetry / pip-tools / lockfiles
+poetry.lock
+requirements.txt
+
+# Optional: Static assets build
+frontend/dist/
+frontend/node_modules/
