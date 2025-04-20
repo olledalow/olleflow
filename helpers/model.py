@@ -11,12 +11,13 @@ def created_at_column() -> datetime:
     return Field(sa_column=Column(TIMESTAMP(timezone=True), nullable=False))
 
 
-def updated_at_column() -> datetime:
+def updated_at_column() -> datetime | None:
     return Field(
+        default=None,
         sa_column=Column(
             TIMESTAMP(timezone=True),
             nullable=True,
-        )
+        ),
     )
 
 

@@ -1,29 +1,26 @@
 # services/user_service.py
 from sqlmodel.ext.asyncio.session import AsyncSession
-from models.user import User
-from schemas.user import UserCreate, UserUpdate
+from models.user import User, UserCreate, UserUpdate
+
+# from schemas.user import UserCreate, UserUpdate
 from helpers.service import DefaultMixins
 from crud.user import user_crud, UserCRUD
 from datetime import datetime, timezone
+from core.security import get_password_hash
 
 
 class UserService(DefaultMixins[User, UserCreate, UserUpdate]):
-    item_crud: UserCRUD = user_crud
+    crud: UserCRUD = user_crud
 
-    async def hash_password(self, password: str):
-        return password + "H4$SH3D"
-
-    async def create_user(self, db: AsyncSession, user: UserCreate) -> User:
-        new_user = User(
-            email=user.email,
-            hashed_password=await self.hash_password(user.password),
-            created_at=datetime.now(timezone.utc),
+    async def create_user(self, db: AsyncSession, user_create: UserCreate) -> User:
+        new_user = User.model_validate(
+            user_create,
+            update={
+                "hashed_password": get_password_hash(user_create.set_password),
+                "created_at": datetime.now(timezone.utc),
+            },
         )
-        db.add(new_user)
-        await db.commit()
-        await db.refresh(new_user)
-
-        return new_user
+        return await self.crud.create_user(db=db, new_user=new_user)
 
 
 user_service = UserService(user_crud)

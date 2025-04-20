@@ -13,34 +13,32 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=UpdateBase)
 
 
 class ServiceBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(
-        self, item_crud: BaseCRUD[ModelType, CreateSchemaType, UpdateSchemaType]
-    ):
-        self.item_crud = item_crud
+    def __init__(self, crud: BaseCRUD[ModelType, CreateSchemaType, UpdateSchemaType]):
+        self.crud = crud
 
 
 class QueryMixin(ServiceBase[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def get_all_items(
         self, db: AsyncSession, query_params: QueryParams
     ) -> Sequence[ModelType]:
-        result = await self.item_crud.find_all(db, query_params)
+        result = await self.crud.find_all(db, query_params)
         return result
 
     async def get_item_by_id(self, db: AsyncSession, id: int) -> Optional[ModelType]:
         try:
-            return await self.item_crud.find_by_id_or_raise(db, id)
+            return await self.crud.find_by_id_or_raise(db, id)
         except ItemNotFoundError as e:
             raise HTTPException(404, e.__dict__)
 
     async def get_items_by_params(
         self, db: AsyncSession, params: dict[str, Any]
     ) -> Sequence[ModelType]:
-        return await self.item_crud.find_by_params(db, params)
+        return await self.crud.find_by_params(db, params)
 
     async def get_items_by_params_in(
         self, db: AsyncSession, params: dict[str, list[Any]]
     ) -> Sequence[ModelType]:
-        return await self.item_crud.find_by_param_in(db, params)
+        return await self.crud.find_by_param_in(db, params)
 
 
 class CreateMixin(ServiceBase[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -48,7 +46,7 @@ class CreateMixin(ServiceBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         self, db: AsyncSession, item_in: CreateSchemaType
     ) -> ModelType:
         print("create service")
-        return await self.item_crud.create(db, obj_in=item_in)
+        return await self.crud.create(db, obj_in=item_in)
 
 
 class UpdateMixin(ServiceBase[ModelType, CreateSchemaType, UpdateSchemaType]):
@@ -56,20 +54,20 @@ class UpdateMixin(ServiceBase[ModelType, CreateSchemaType, UpdateSchemaType]):
         self, db: AsyncSession, id: int, item_in: UpdateSchemaType
     ) -> Optional[ModelType]:
         try:
-            db_obj = await self.item_crud.find_by_id_or_raise(db=db, id=id)
+            db_obj = await self.crud.find_by_id_or_raise(db=db, id=id)
         except ItemNotFoundError as e:
             raise HTTPException(404, e.__dict__)
         update_dict = item_in.model_dump(exclude_unset=True)
-        return await self.item_crud.update(db, db_obj=db_obj, update_data=update_dict)
+        return await self.crud.update(db, db_obj=db_obj, update_data=update_dict)
 
 
 class DeleteMixin(ServiceBase[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def delete_item(self, db: AsyncSession, id: int) -> Optional[ModelType]:
         try:
-            _ = await self.item_crud.find_by_id_or_raise(db=db, id=id)
+            _ = await self.crud.find_by_id_or_raise(db=db, id=id)
         except ItemNotFoundError as e:
             raise HTTPException(404, e.__dict__)
-        return await self.item_crud.delete(db, id)
+        return await self.crud.delete(db, id)
 
 
 class DefaultMixins(
